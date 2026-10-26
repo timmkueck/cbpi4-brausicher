@@ -32,7 +32,7 @@ Für die Anzeige liefert er immer eine Zahl (vor der ersten Messung 0), weil cbp
 **SicherAktor** schaltet über lgpio. Ein eigener Thread setzt den Ausgang: Bei Leistung unter 100 % taktet er
 wie der GPIOActor (Takt 2 oder 5 s). Hängt CraftBeerPi länger als 3 s, schaltet der Thread aus. Nach jedem
 Schalten liest er den Pegel zurück. Beim Beenden schaltet er aus und gibt den GPIO frei. Ein GPIO, den ein
-anderer Aktor schon nutzt (auch das Wasserventil auf 19), wird abgelehnt.
+anderer Aktor schon nutzt (auch das Wasserventil aus `cbpi4-ventil`), wird abgelehnt.
 
 Bei **Art = Heizung** gilt der Heizschutz:
 
@@ -55,12 +55,21 @@ nichts von selbst. Wasserschritte von `cbpi4-ventil` öffnen nach einem Absturz 
 
 ## Belegung HAT „Biersteuerung“
 
+Stand der Platine: Biersteuerung, Zweig `ventile-druck`, Commit f5a2bcf (HAT mit Ventilausgängen).
+
 | Aktor | GPIO | Art | Aktiv bei |
 |---|---|---|---|
 | Kessel (J4) | 27 | Heizung, Fühler im Kessel | HIGH |
 | Heizelement (J8) | 20 | Heizung, Fühler im Kessel | HIGH |
 | Rührwerk (J7) | 18 | Rührwerk | HIGH |
-| Wasserventil (J13) | 19 | **nicht hier**, sondern `cbpi4-ventil` | HIGH |
+| Kühlschrank (J13) | 19 | Sonstiges | HIGH |
+| Reserve (J15/J16) | 21/22 | Sonstiges | HIGH |
+| Druckventile 1–4 (J17) | 16, 17, 26, 13 | Sonstiges, aus `cbpi4-gaerdruck` angelegt | HIGH |
+| Brauwasser (J20, V5) | 9 | **nicht hier**, sondern `cbpi4-ventil` (Durchfluss J19 = GPIO 6) | HIGH |
+| Kühlspirale, Dampfkondensator (J20, V6/V7) | 10, 11 | Sonstiges | HIGH |
+
+GPIO 9–11 sind SPI-Pins: **SPI auf dem Pi nicht aktivieren.** Beim alten HAT ohne Ventilausgänge hängt das
+Wasserventil am Relais J13 (GPIO 19, über `cbpi4-ventil`), der Durchflussmesser an GPIO 24.
 
 ## Einbau
 
@@ -76,7 +85,8 @@ sudo systemctl daemon-reload && sudo systemctl restart craftbeerpi
 journalctl -u craftbeerpi | grep cbpi4_brausicher
 ```
 
-`brausteuerung-sicher.conf` setzt die GPIOs 27, 20, 18, 19, 21 und 22 vor jedem Start und nach jedem Ende auf aus,
+`brausteuerung-sicher.conf` setzt alle Ausgänge des HAT (Relais 27, 20, 18, 19, 21, 22 und Ventile 16, 17, 26, 13, 9,
+10, 11) vor jedem Start und nach jedem Ende auf aus,
 startet nach einem Absturz neu und ersetzt `ventil-zu.conf`. Der Dienstname `craftbeerpi` ist angenommen:
 `systemctl list-units | grep -i craft` zeigt den richtigen.
 

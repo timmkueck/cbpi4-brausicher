@@ -121,7 +121,8 @@ class SicherFuehler(CBPiSensor):
 # --- Aktor ----------------------------------------------------------------
 
 @parameters([
-    Property.Select("GPIO", options=GPIOS, description="Ausgang (BCM). HAT: Kessel 27, Heizelement 20, Rührwerk 18"),
+    Property.Select("GPIO", options=GPIOS, description="Ausgang (BCM). HAT: Kessel 27, Heizelement 20, Rührwerk 18, "
+                    "Kühlschrank 19, Ventile 16/17/26/13, Kühlspirale 10, Dampfkondensator 11"),
     Property.Select("Aktiv bei", options=["HIGH", "LOW"], description="HAT Biersteuerung: HIGH"),
     Property.Select("Art", options=[HEIZUNG, RUEHRWERK, SONSTIGES],
                     description="Heizung braucht einen SicherFuehler"),
